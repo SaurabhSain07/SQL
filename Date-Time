@@ -1,0 +1,15 @@
+
+--Write a Query to provide the date for nth occurrence of Sunday in future from given date
+--datepart
+--sunday-1
+--monday-2
+--friday-6
+--saturday-7
+
+declare @today date ='2025-02-20' --Saturday
+declare @n int
+--select @today
+set @n=1
+--select datepart(weekDay,@today) --7
+
+select dateadd(week,@n-1,DATEADD(day, 8-Datepart(WEEKDAY,@today),@today)) as sunday
