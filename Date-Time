@@ -13,3 +13,113 @@ set @n=1
 --select datepart(weekDay,@today) --7
 
 select dateadd(week,@n-1,DATEADD(day, 8-Datepart(WEEKDAY,@today),@today)) as sunday
+
+create database [Date Time]
+go
+
+use [Date Time]
+--How do you find the first day of the current month using SQL functions?
+select dateAdd(MONTH,DATEDIFF(MONTH,0, GETDATE()),0)
+
+select dateadd(day,1,EOMONTH(Getdate(), -1))
+
+--How do you add 7 days to the current date?
+select Dateadd(DAY,7,GETDATE())
+
+--How do you subtract 3 months from the current date?
+select dateadd(MONTH,-3,GetDate())
+
+--How do you get the day of the week (Sunday, Monday, etc.) for a given date?
+select DATENAME(WEEKDAY,GETDATE())
+
+select
+	case when datePart(WEEKDAY, '2025-02-11') in(1,7) then 'Weekend'
+	else 'Weekday' end as datatype
+
+--How do you check if a date is between two other dates?
+declare @start datetime ='2025-02-10 16:49:55.990'
+declare @end datetime='2025-02-12 15:49:55.990'
+--select @start
+--select @end
+
+--select DATEDIFF(DAY,@start,@end)
+
+--How do you find the difference in hours between two dates?
+
+select DATEDIFF(DAY,@start,@end) as [Days], 
+cast(DATEDIFF(MINUTE,@start,@end)/60.0 as decimal(10,2)) as [Time Hour]
+
+--How do you round a DateTime to the nearest minute?
+
+select 
+	DATEADD(second,
+	DATEDIFF(second, '20000101',GETDATE())/60*60,'20000101') as nearestMinute
+
+
+CREATE TABLE Employees (
+    Emp_Id INT PRIMARY KEY,
+    Emp_Name NVARCHAR(100),
+    Salary DECIMAL(10,2),
+    Join_Date DATETIME
+);
+
+INSERT INTO Employees (Emp_Id, Emp_Name, Salary, Join_Date)
+VALUES
+(1, 'Rajesh Kumar', 50000.00, '2024-01-10 09:30:00'),
+(2, 'Priya Sharma', 60000.50, '2023-12-05 10:15:30'),
+(3, 'Amit Verma', 55000.75, '2022-08-20 14:45:10'),
+(4, 'Sneha Gupta', 70000.25, '2021-06-15 08:50:45'),
+(5, 'Vikas Singh', 65000.00, '2020-03-30 12:20:15')
+INSERT INTO Employees values
+(6, 'Sneha Gupta', 70000.25, '2025-02-17 08:50:45'),
+(7, 'Vikas Singh', 65000.00, '2025-02-18 12:20:15');
+
+--How do you find all records where the timestamp is within the last 24 hours?
+select *from Employees
+where Join_Date>=dateadd(HOUR,-24,Getdate())
+
+--How do you extract the quarter from a date in SQL?
+select *, DatePart(QUARTER,Join_Date) as [Quarter] from Employees
+order by [Quarter]
+
+--How do you get the number of days in a given month?
+select datePart(DAY,EOMONTH('2025-04-01'));
+
+--How do you generate a list of dates between two given dates?
+declare @Start1 date='2025-02-02';
+declare @end1 date='2025-02-20';
+
+with Cte_date as
+(select @Start1 as days
+ union all
+ select dateadd(DAY,1,days) from Cte_date where dateadd(DAY,1,days)<=@end1
+)
+select *from Cte_date
+
+--How do you find the next Monday after a given date?
+
+declare @today date=Getdate()
+
+select dateadd(DAY,9-DATEPART(WEEKDAY,@today),@today) as Monday
+
+--How do you find the first Monday of a given month?
+declare @today1 date=GetDate()
+select dateadd(day,9-(DATEPART(weekDay,@today1)),EOMONTH(@today1,-1))
+
+--How do you check if a year is a leap year using SQL?
+declare @year varchar(4) ='2024'
+select case 
+		when day(Eomonth(concat(@year,'-02-01')))=29
+		then 'Leap Year'
+		else 'Not a Leap Year'
+		end as CheckYear
+
+--How do you remove the time portion from a DateTime value?
+declare @one datetime =Getdate()
+select CONVERT(varchar(30), @one, 105) as [Date]
+
+select dateadd(day,DATEDIFF(day,0, GETDATE()),0) as Today
+
+--How do you convert a string date (VARCHAR) to DATETIME in SQL?
+declare @two varchar(30)='2025-02-23'
+select convert(datetime,@two) as Today
