@@ -118,6 +118,20 @@ select case
 declare @one datetime =Getdate()
 select CONVERT(varchar(30), @one, 105) as [Date]
 
+--How do you get the UTC Date and Time in SQL Server?
+select Getdate()
+select GETUTCDATE() --Universal dateTime
+
+--How do you display a DateTime in a 12-hour format with AM/PM?
+declare @three datetime ='2025-02-22 13:05:21.280'
+if DATEPART(HOUR,@three)<=12
+begin
+	print left(convert(varchar(30),@three,108),5)+' AM'
+end
+else if DATEPART(HOUR,@three)>12
+begin
+	print format(DatePart(Hour, @three)/12,'00')+':'+Format(DatePart(minute, @three),'00')+' PM'
+end
 select dateadd(day,DATEDIFF(day,0, GETDATE()),0) as Today
 
 --How do you convert a string date (VARCHAR) to DATETIME in SQL?
