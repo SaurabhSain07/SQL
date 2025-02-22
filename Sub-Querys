@@ -1,0 +1,393 @@
+create database [sub-query]
+
+use [sub-query]
+
+--Employees table
+CREATE TABLE Employees (
+    EmpID INT PRIMARY KEY,
+    EmpName VARCHAR(50),
+    DepartmentID INT,
+    Salary INT,
+    Age INT
+);
+
+--Employee Table
+CREATE TABLE Employee (
+    Id INT PRIMARY KEY,
+    E_Name NVARCHAR(100),
+    Department NVARCHAR(50),
+    Salary DECIMAL(10,2)
+);
+
+go
+
+INSERT INTO Employee (Id, E_Name, Department, Salary) VALUES
+(1, 'Rajesh Kumar', 'IT', 60000.00),
+(2, 'Priya Sharma', 'HR', 50000.50),
+(3, 'Amit Verma', 'Finance', 65000.75),
+(4, 'Sneha Gupta', 'Marketing', 70000.25),
+(5, 'Vikas Singh', 'IT', 62000.00),
+(6, 'Pooja Mehra', 'HR', 48000.00),
+(7, 'Rohan Das', 'Finance', 67000.50),
+(8, 'Anjali Yadav', 'Marketing', 72000.75),
+(9, 'Sunil Patil', 'IT', 58000.25),
+(10, 'Meera Nair', 'HR', 51000.00),
+(11, 'Karan Thakur', 'Finance', 69000.50),
+(12, 'Divya Chauhan', 'Marketing', 75000.75),
+(13, 'Alok Mishra', 'IT', 63000.00),
+(14, 'Snehal Joshi', 'HR', 47000.00),
+(15, 'Arjun Kapoor', 'Finance', 66000.25),
+(16, 'Neha Agarwal', 'Marketing', 71000.50),
+(17, 'Mohit Sharma', 'IT', 59000.75),
+(18, 'Komal Jain', 'HR', 49500.00),
+(19, 'Sandeep Gupta', 'Finance', 68000.25),
+(20, 'Ritika Saxena', 'Marketing', 73000.50);
+
+INSERT INTO Employees VALUES
+(1, 'John', 101, 50000, 30),
+(2, 'Alice', 102, 70000, 28),
+(3, 'Bob', 101, 45000, 35),
+(4, 'David', 103, 60000, 40),
+(5, 'Emma', 102, 80000, 29),
+(6, 'Sam', 104, 40000, 32);
+
+--department table
+CREATE TABLE Departments (
+    DepartmentID INT PRIMARY KEY,
+    DepartmentName VARCHAR(50),
+    Region VARCHAR(20)
+);
+
+INSERT INTO Departments VALUES
+(101, 'HR', 'North'),
+(102, 'IT', 'South'),
+(103, 'Sales', 'East'),
+(104, 'Finance', 'West');
+
+--Orders Table
+CREATE TABLE Orders (
+    OrderID INT PRIMARY KEY,
+    CustomerID INT,
+    OrderDate DATE,
+    OrderAmount INT
+);
+
+INSERT INTO Orders VALUES
+(1, 1001, '2023-01-01', 5000),
+(2, 1002, '2023-01-02', 8000),
+(3, 1003, '2023-01-02', 3000),
+(4, 1001, '2023-01-03', 7000),
+(5, 1004, '2023-01-04', 2000);
+
+--customer table
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY,
+    CustomerName VARCHAR(50),
+    Country VARCHAR(20)
+);
+
+INSERT INTO Customers VALUES
+(1001, 'Alex', 'USA'),
+(1002, 'Brian', 'Canada'),
+(1003, 'Cathy', 'USA'),
+(1004, 'Derek', 'India');
+
+--Product Table
+CREATE TABLE Products (
+    ProductID INT PRIMARY KEY,
+    ProductName VARCHAR(50),
+    Price INT
+);
+
+INSERT INTO Products VALUES
+(1, 'Laptop', 1000),
+(2, 'Mouse', 50),
+(3, 'Keyboard', 100),
+(4, 'Monitor', 300),
+(5, 'Printer', 200);
+
+
+--students Table
+CREATE TABLE Students (
+    StudentID INT PRIMARY KEY,
+    StudentName VARCHAR(50),
+    ClassID INT,
+    Marks INT,
+    Subject VARCHAR(20)
+);
+
+INSERT INTO Students VALUES
+(1, 'Tom', 1, 85, 'Math'),
+(2, 'Jerry', 1, 78, 'Math'),
+(3, 'Anna', 2, 92, 'Science'),
+(4, 'Lucy', 2, 88, 'Science'),
+(5, 'Mia', 1, 90, 'Math');
+
+--Project Table
+CREATE TABLE Projects (
+    ProjectID INT PRIMARY KEY,
+    EmpID INT,
+    ProjectName VARCHAR(50),
+    StartDate DATE,
+    EndDate DATE
+);
+
+INSERT INTO Projects VALUES
+(1, 1, 'Alpha', '2023-01-01', '2023-06-30'),
+(2, 3, 'Beta', '2023-02-01', '2023-08-31'),
+(3, 5, 'Gamma', '2023-03-01', '2023-07-31');
+
+--Managers Table
+CREATE TABLE Managers (
+    ManagerID INT PRIMARY KEY,
+    ManagerName VARCHAR(50),
+    EmpID INT
+);
+
+INSERT INTO Managers VALUES
+(1, 'Michael', 1),
+(2, 'Sarah', 4),
+(3, 'James', 5);
+
+--Find employees whose salaries are above the average salary.
+
+select *from Employees
+
+select EmpName from Employees
+where Salary >(select AVG(Salary)from Employees)
+
+--Find the department names where at least one employee earns more than 60,000.
+
+select distinct D.DepartmentName from Employees E
+inner join Departments D on D.DepartmentID=E.DepartmentID
+where E.Salary >60000
+
+
+--Retrieve the employee(s) with the highest salary using a subquery.
+
+select EmpName From Employees 
+where Salary in(Select Max(Salary) from Employees)
+
+--List employees who work in the department with the lowest total salary.
+
+Select E.EmpName, E.DepartmentID, E.Salary from Employees E
+where E.DepartmentID=(Select Top 1 DepartmentID 
+from Employees 
+group by DepartmentID
+Order by sum(Salary) asc
+)
+
+--Find customers who placed the most orders.
+select *from Customers
+select *from Orders
+
+Select CustomerID, count(OrderID) as totalOrder from Orders
+group by CustomerID
+having COUNT(OrderID)=(
+select max(OrderCount) 
+from(
+select top 1 CustomerID, Count(orderId) as OrderCount
+from Orders 
+group by CustomerID
+ ) as subQuery
+)
+
+select CustomerID, COUNT(OrderID) as totalOrder
+from Orders
+group by CustomerID
+having COUNT(OrderID)=
+(select max(OrderCount) from
+ (select top 1 CustomerID, COUNT(OrderID)as OrderCount 
+ from Orders
+ group by CustomerID
+ order by COUNT(OrderID) desc
+ )as subQuery
+)
+
+--Retrieve the names of employees who do not belong to any department.
+
+select DepartmentID,EmpName
+from Employees
+where DepartmentID not in (select DepartmentID from Departments) or DepartmentID is null
+
+select *from Employees
+select * from Departments
+
+insert into Employees values(8,'Ram',105,35000,22)
+
+--List products that have a price higher than the average price of all products.
+
+select *from Products
+
+select ProductName, Price from Products
+where Price >(select avg(Price) from Products)
+
+--Find employees who earn less than the average salary of their department.
+
+select EmpName, Salary, DepartmentID 
+from Employees E
+where E.Salary <(select AVG(Salary) from Employees where DepartmentID=E.DepartmentID)
+
+--Retrieve departments where no employees are assigned.
+
+select *from Departments
+
+--with use of join
+select D.DepartmentName from Employees E
+Right join Departments D on E.DepartmentID=D.DepartmentID
+where EmpName is null
+
+select DepartmentName from Departments
+where DepartmentID not in (select distinct DepartmentID from Employees)
+
+--List employees whose salary is greater than the average salary in their department.
+
+select *from Employees
+
+select EmpName, Salary,DepartmentID from Employees E
+where Salary >(Select AVG(Salary) 
+from Employees 
+where DepartmentID=E.DepartmentID)
+
+--Retrieve students who scored above the average marks in their class.
+
+select *from Students
+
+select StudentName,Marks, ClassID from Students S
+where Marks >(select AVG(Marks) from Students where ClassID=S.ClassID)
+
+--Find orders with an amount greater than the average order amount.
+
+select *from Orders
+
+select OrderID,OrderAmount from Orders
+where OrderAmount >(select avg(OrderAmount) from Orders)
+
+--Display customers who have placed at least one order with an amount greater than 5000.
+
+select CustomerName,O.OrderAmount from Customers C
+inner join Orders O on O.CustomerID=C.CustomerID
+where O.OrderAmount >(select OrderAmount from Orders where OrderAmount=5000)
+
+--Retrieve employees who have worked in more than one department.
+
+select EmpName,count(DepartmentID) as TatalEmp 
+from Employees
+group by EmpName
+having count(DepartmentID)>1
+
+--Find products that have been sold at a quantity greater than the average quantity.
+select *from Products
+
+--List employees whose salaries are greater than any employee in the "HR" department.
+
+select E.EmpName,D.DepartmentName,E.Salary from Employees E
+inner Join Departments D on E.DepartmentID=D.DepartmentID
+where E.Salary >(select max(E1.Salary) as HeiestSalary from Departments D1 
+  inner join Employees E1 on E1.DepartmentID=D1.DepartmentID
+  where D1.DepartmentName='HR')
+
+--Display students who have fewer marks than the highest marks in the "Math" subject.
+select *from Students
+
+select top 1 Marks from Students
+where Marks in (select top(2) Marks from Students where Subject='Math' order by Marks desc)
+Order by Marks asc
+
+--Find employees whose age is greater than the average age of employees in the company.
+select *from Employees
+
+select EmpName, Age from Employees
+where age >(select avg(age) from Employees)
+
+--Retrieve orders whose total amount is greater than the sum of all orders on "2023-01-01".
+
+select *from Orders
+
+select OrderID,OrderDate,OrderAmount from Orders
+where OrderAmount > (
+select sum(OrderAmount) as TotalAmount 
+from Orders 
+where OrderDate='2023-01-01'
+)
+select *from Employees
+
+--Find the Employees who have highest Salary in our Department
+
+select EmpName,DepartmentID,Salary from Employees
+where Salary in
+(select MaxSalary from
+(select DepartmentID, max(Salary) as MaxSalary
+from Employees 
+group by DepartmentID) as SubQuery
+)
+Order by DepartmentID
+
+--Find customers who have placed no orders
+
+select *from Orders
+select *from Customers
+
+select CustomerID from Orders
+where OrderID not in (select OrderID from Orders)
+
+--List employees who belong to departments in the "North" region
+select *from Employees
+select *from Departments
+
+select EmpName From Employees
+where DepartmentID in (select DepartmentID from Departments where Region='North')
+
+--Find employees whose salaries match any salaries in the "Sales" department
+
+select EmpName,Salary from Employees E1
+where E1.Salary in (select E.Salary from Employees E 
+Right join Departments D on D.DepartmentID=E.DepartmentID
+where D.DepartmentName='Sales' and E1.DepartmentID <> E.DepartmentID);
+
+with CTE_MaxSalaryEveryDepartment as
+(select DepartmentID, Max(Salary) as MaxSalary from Employees group By DepartmentID)
+select E.EmpName,M.DepartmentID, M.MaxSalary from CTE_MaxSalaryEveryDepartment M
+inner join Employees E on E.DepartmentID=M.DepartmentID and E.Salary=M.MaxSalary
+
+--Display customers who have placed orders in both "January" and "February".
+
+select CustomerName from Customers
+where CustomerID in(select CustomerID from Orders
+where DateName(MM,OrderDate)='January') 
+and CustomerID in (select CustomerID from Orders where DateName(MM,OrderDate)='February')
+
+
+--Retrieve employees whose names are in a list of the top 5 earners.
+select EmpName, Salary from Employees
+where Salary in (select top 5 Salary from Employees order by Salary desc)
+
+--Find employees who are not managers.
+
+select EmpID,EmpName from Employees
+where EmpID not in (select EmpID from Managers)
+
+--List all orders that belong to customers from the "USA"
+
+select OrderID from Orders
+where CustomerID in (select CustomerID from Customers where Country='USA')
+
+--Retrieve orders whose total amount is greater than the sum of all orders on "2023-01-01".
+
+select *from Orders
+
+select OrderID,OrderAmount from Orders O
+where O.OrderAmount > (select ToatlOrderAmout from 
+(select OrderDate,sum(OrderAmount) as ToatlOrderAmout 
+from Orders
+where OrderDate='2023-01-01'
+group by OrderDate) as SubQuery)
+
+--10 % incearment Salary When Salary is grater then Avrage Salary and 5 % increment when Salary is 
+--less then Avrage Salary
+
+update Employee set Salary= case when Salary>(select Avg(Salary) from Employee) then Salary+(Salary*0.1)
+                            when Salary<(select Avg(Salary) from Employee) then Salary+(Salary*0.05)
+						    end
+select *from Employee
+select avg(Salary) from Employee
