@@ -1,0 +1,387 @@
+create database CTE
+
+use CTE
+
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY,
+    EmpName NVARCHAR(100),
+    Salary DECIMAL(10, 2),
+    DepartmentID INT,
+    ManagerID INT
+);
+
+INSERT INTO Employees (EmployeeID, EmpName, Salary, DepartmentID, ManagerID)
+VALUES 
+(1, 'John', 80000, 1, NULL),
+(2, 'Alice', 60000, 1, 1),
+(3, 'Bob', 55000, 2, 1),
+(4, 'Charlie', 70000, 2, 1),
+(5, 'Eve', 50000, 3, 1),
+(6, 'Dave', 40000, NULL, 1),
+(7, 'Megan', 85000, 1, NULL),
+(8, 'Sophia', 75000, 2, 7),
+(9, 'Liam', 50000, 3, 7),
+(10, 'Emma', 65000, 1, 7);
+
+CREATE TABLE Departments (
+    DepartmentID INT PRIMARY KEY,
+    DepartmentName NVARCHAR(100)
+);
+
+INSERT INTO Departments (DepartmentID, DepartmentName)
+VALUES 
+(1, 'IT'),
+(2, 'HR'),
+(3, 'Sales'),
+(4, 'Marketing');
+
+CREATE TABLE Orders (
+    OrderID INT PRIMARY KEY,
+    CustomerID INT,
+    OrderDate DATE,
+    TotalAmount DECIMAL(10, 2)
+);
+
+INSERT INTO Orders (OrderID, CustomerID, OrderDate, TotalAmount)
+VALUES 
+(1, 101, '2024-01-10', 500.00),
+(2, 102, '2024-01-15', 700.00),
+(3, 103, '2024-02-20', 400.00),
+(4, 101, '2024-02-25', 1000.00),
+(5, 102, '2024-03-01', 300.00),
+(6, 104, '2024-03-05', 800.00);
+
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY,
+    CustomerName NVARCHAR(100),
+    ContactNumber NVARCHAR(15)
+);
+
+INSERT INTO Customers (CustomerID, CustomerName, ContactNumber)
+VALUES 
+(101, 'Michael', '1234567890'),
+(102, 'Sarah', '0987654321'),
+(103, 'James', '1122334455'),
+(104, 'Anna', '6677889900');
+
+CREATE TABLE Sales (
+    SaleID INT PRIMARY KEY,
+    SalespersonID INT,
+    SaleDate DATE,
+    Amount DECIMAL(10, 2),
+    Region NVARCHAR(50)
+);
+
+INSERT INTO Sales (SaleID, SalespersonID, SaleDate, Amount, Region)
+VALUES 
+(1, 201, '2024-01-15', 1000.00, 'East'),
+(2, 202, '2024-02-10', 1500.00, 'West'),
+(3, 203, '2024-03-05', 2000.00, 'East'),
+(4, 201, '2024-03-10', 500.00, 'North'),
+(5, 204, '2024-04-01', 1200.00, 'South');
+
+
+CREATE TABLE Products (
+    ProductID INT PRIMARY KEY,
+    ProductName NVARCHAR(100),
+    Price DECIMAL(10, 2),
+    CategoryID INT
+);
+
+INSERT INTO Products (ProductID, ProductName, Price, CategoryID)
+VALUES 
+(1, 'Laptop', 800.00, 1),
+(2, 'Mouse', 20.00, 1),
+(3, 'Keyboard', 30.00, 1),
+(4, 'Chair', 150.00, 2),
+(5, 'Desk', 200.00, 2);
+
+CREATE TABLE Categories (
+    CategoryID INT PRIMARY KEY,
+    CategoryName NVARCHAR(100),
+    ParentCategoryID INT
+);
+
+INSERT INTO Categories (CategoryID, CategoryName, ParentCategoryID)
+VALUES 
+(1, 'Electronics', NULL),
+(2, 'Furniture', NULL),
+(3, 'Office Supplies', NULL);
+
+CREATE TABLE Jobs (
+    JobID INT PRIMARY KEY,
+    JobTitle NVARCHAR(100),
+    MinSalary DECIMAL(10, 2),
+    MaxSalary DECIMAL(10, 2)
+);
+
+INSERT INTO Jobs (JobID, JobTitle, MinSalary, MaxSalary)
+VALUES 
+(1, 'Software Engineer', 50000, 100000),
+(2, 'HR Manager', 60000, 90000),
+(3, 'Sales Executive', 40000, 80000),
+(4, 'Marketing Manager', 55000, 85000);
+
+CREATE TABLE Invoices (
+    InvoiceID INT PRIMARY KEY,
+    InvoiceDate DATE,
+    InvoiceAmount DECIMAL(10, 2)
+);
+
+INSERT INTO Invoices (InvoiceID, InvoiceDate, InvoiceAmount)
+VALUES 
+(1, '2024-01-10', 500.00),
+(2, '2024-02-15', 700.00),
+(3, '2024-03-20', 900.00),
+(4, '2024-04-05', 1200.00);
+
+CREATE TABLE SalesGrowth (
+    Year INT,
+    Region NVARCHAR(50),
+    TotalSales DECIMAL(10, 2)
+);
+
+INSERT INTO SalesGrowth (Year, Region, TotalSales)
+VALUES 
+(2021, 'East', 50000.00),
+(2022, 'West', 45000.00),
+(2023, 'North', 55000.00),
+(2024, 'South', 60000.00);
+
+-- Create the WorkingDays table
+CREATE TABLE WorkingDays (
+    EmployeeID INT NOT NULL,
+    WorkDate DATE NOT NULL
+);
+
+-- Insert sample data into WorkingDays table
+INSERT INTO WorkingDays (EmployeeID, WorkDate)
+VALUES
+    (1, '2023-12-01'),
+    (1, '2023-12-02'),
+    (1, '2023-12-03'),
+    (1, '2023-12-05'),
+    (2, '2023-12-01'),
+    (2, '2023-12-02'),
+    (2, '2023-12-04');
+
+CREATE TABLE SalesData (
+    Year INT NOT NULL,
+    ProductID INT NOT NULL,
+    TotalSales DECIMAL(18, 2) NOT NULL
+);
+
+-- Insert sample data into the SalesData table
+INSERT INTO SalesData (Year, ProductID, TotalSales) VALUES
+(2021, 1, 1000.00),
+(2022, 1, 1200.00),
+(2023, 1, 1500.00),
+(2021, 2, 800.00),
+(2022, 2, 600.00),
+(2023, 2, 700.00);
+
+
+--Write a CTE to retrieve all employees from the Employees table.
+
+with CTE_Employess as
+(select *from Employees)
+select EmpName from CTE_Employess;
+
+--Use a CTE to calculate the total sales for each salesperson.
+
+with CTE_calculate as
+(select SalespersonID,sum(Amount) as TotalAmount from Sales
+group by SalespersonID)
+select SalespersonID, TotalAmount from CTE_calculate;
+
+--Create a CTE that ranks employees based on their salary.
+with CTE_RankSalary as
+(select *,Rank() over(order by Salary desc) as SalaryRank from Employees)
+select EmpName, Salary,SalaryRank from CTE_RankSalary;
+
+--Write a CTE to list all managers and their subordinates.
+with CTE_Managers as
+(select E2.*, E1.EmpName as ManagerName from Employees E1
+inner join Employees E2 on E1.EmployeeID=E2.ManagerID)
+select EmpName,ManagerName from CTE_Managers;
+
+--Use a CTE to calculate the average salary in each department.
+with CTE_AVGSalary as
+(select DepartmentID, avg(Salary) as AvgSalary from Employees
+group by DepartmentID)
+select D.DepartmentName, C.AvgSalary from CTE_AVGSalary C
+inner join Departments D on D.DepartmentID=C.DepartmentID;
+
+--Create a recursive CTE to generate a sequence of numbers from 1 to 100.
+
+with CTE_Counter as
+(select 1 as N
+union all
+select N+1 from CTE_Counter where N<100)
+select N from CTE_Counter;
+
+--Write a CTE to find employees who earn above the average salary.
+with CTE_GraterThenAvgSalary as
+(select avg(Salary) as AvgSalary from Employees)
+select E.EmpName,E.Salary from CTE_GraterThenAvgSalary C
+cross join Employees E where E.Salary>C.AvgSalary;
+
+--Use a CTE to calculate the cumulative total sales for each region.
+with CTE_cumulativeSale as
+(select Region, SaleDate,Amount, sum(Amount) over(partition by Region order by Saledate) as TotalAmount from Sales)
+select *from CTE_cumulativeSale;
+
+--Write a CTE to display the top 5 highest-paid employees.
+with CTE_Top5HighestPaid as
+(select top 5 EmpName,Salary from Employees order by Salary desc)
+select *from CTE_Top5HighestPaid;
+
+--Create a CTE to list all unique job titles from the Jobs table.
+
+with CTE_ListAllUnique as
+(select *,DENSE_RANK()over (Partition by JobTitle order by JobId) as TitleRank from Jobs)
+select JobTitle from CTE_ListAllUnique where TitleRank=1
+
+--Use a CTE to find departments with no employees assigned.
+with CTE_employees as
+(select *from Departments)
+select C.DepartmentName from Employees E
+right join CTE_employees C on E.DepartmentID=C.DepartmentID 
+where EmpName is null;
+
+--Create a CTE that calculates the factorial of a number recursively.
+declare @N int;
+set @N=5;
+
+with CTE_factorial as
+(select 1 as Number, 1 as Factorial
+union all
+select Number+1, Factorial*(Number+1) from CTE_factorial where Number < @N )
+select Factorial from CTE_factorial;
+
+--Write a CTE to display the hierarchy of employees reporting to the CEO.
+
+with CTE_hierarchy as
+(select EmployeeID,EmpName,ManagerID, 
+cast(EmpName as varchar(max)) as HierarchyPath 
+from Employees
+where ManagerID is null
+union all
+select E.EmployeeID,E.EmpName,E.ManagerID, 
+cast(ch.HierarchyPath+' -> '+E.EmpName as varchar(max)) as HierarchyPath From CTE_hierarchy ch
+inner join Employees E on E.ManagerID=ch.EmployeeID
+)
+select EmployeeID,EmpName,ManagerID, HierarchyPath 
+from CTE_hierarchy
+order by HierarchyPath;
+
+--Use a CTE to list all orders and their cumulative revenue by order date.
+with CTE_cumulative as
+(select OrderID,OrderDate,TotalAmount, 
+SUM(TotalAmount) over(partition by OrderDate order by OrderID) as cumulative_revenue
+from Orders)
+select *from CTE_cumulative;
+
+--Write a CTE to filter customers who have placed orders in January but not February.
+with CTE_filterCustomers as
+(select CustomerID,OrderDate from Orders 
+where DateName(mm,OrderDate)='January' 
+and not DateName(mm,OrderDate)='February')
+select C.CustomerName,cf.OrderDate from CTE_filterCustomers cf
+inner join Customers C on C.CustomerID=cf.CustomerID;
+
+--Create a CTE to find employees whose salaries are within 10% of the department average.
+
+with CTE_employeesSalaries as
+(select DepartmentID, avg(Salary) as AvgSalary 
+from Employees group by DepartmentID)
+select E.EmpName,E.Salary from CTE_employeesSalaries ce
+inner join Employees E on E.DepartmentID=ce.DepartmentID
+where E.Salary BETWEEN CE.AvgSalary * 0.9 AND CE.AvgSalary * 1.1;
+
+--Write a CTE to retrieve the second highest salary in the company.
+with CTE_secondHighest as
+(select EmpName,Salary, dense_rank() over(Order by Salary desc) as SalaryRank 
+from Employees)
+select EmpName, Salary from CTE_secondHighest
+where SalaryRank=2;
+
+--Use a CTE to calculate the difference between maximum and minimum salaries by department.
+
+with CTE_SalaryDifference as
+(select DepartmentID, min(Salary) as MinSalary,max(Salary) as MaxSalary 
+from Employees
+group by DepartmentID)
+select D.DepartmentName,(MaxSalary-MinSalary) as SalaryDifference from CTE_SalaryDifference cs
+left join Departments D on D.DepartmentID=cs.DepartmentID;
+
+--Write a recursive CTE to generate a Fibonacci sequence.
+with CTE_Fibonacci as
+(select 1 as position, 0 as FibonacciNumber, 1 as FibonacciNextNumber
+ union all
+ select position+1 as position, 
+ FibonacciNextNumber,
+ FibonacciNumber+FibonacciNextNumber as FibonacciNextNumbers
+ from CTE_Fibonacci
+ where position <10
+)
+select position,FibonacciNumber from CTE_Fibonacci;
+
+--Use a CTE to calculate running totals for sales in a specific year.
+
+select *from Sales;
+with CTE_runingTotal as
+(select SaleId, sum(Amount) over(order by SaleId) as RuningTotal 
+from Sales)
+select *from CTE_runingTotal;
+
+--Write a CTE to find the longest streak of consecutive working days.
+
+with CTE_streak as
+(select EmployeeID, WorkDate,
+DATEADD(Day, -Row_number() over(partition by EmployeeID order by WorkDate), WorkDate)as streakgroup
+from WorkingDays),
+CTE_longeststreak as
+(select EmployeeID,streakgroup, 
+COUNT(*) as Streaklenth, min(WorkDate) as startDate, 
+max(WorkDate) as EndDate 
+from CTE_streak
+group by EmployeeID, streakgroup
+)
+select EmployeeID, Streaklenth, 
+startDate, EndDate from 
+CTE_longeststreak
+where Streaklenth=(select max(Streaklenth) from CTE_longeststreak);
+
+
+--Use a CTE to create a pivot table for sales data grouped by product and month.
+
+select *from  Sales;
+
+with CTE_Pivot as
+(select SalespersonID, dateName(mm,SaleDate) as saleMonth, 
+sum(Amount) as TotalAmount 
+from Sales
+group by SalespersonID,dateName(mm,SaleDate)
+)
+select *from
+(select 
+ SalespersonID, saleMonth,TotalAmount
+from CTE_Pivot) as SourceTable
+pivot
+(
+ sum(TotalAmount)
+ for saleMonth in (January,February,March,April,May,June,July,August,September,October,November,December)
+)as CTE_Pivot;
+
+--Create a CTE to calculate year-over-year sales growth.
+
+with CTE_Sales as
+(select Year,ProductID,TotalSales from SalesData),
+YOYCTEGroth as
+(select c.Year as [Current Year], C.ProductID, C.TotalSales as [Current Sale],
+p.TotalSales as [Previous Sales],
+case when p.TotalSales is not null then  
+from CTE_Sales C
+ left join CTE_Sales P on C.ProductID=P.ProductID
+)
