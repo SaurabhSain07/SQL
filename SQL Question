@@ -1,0 +1,364 @@
+create database MyDatabase
+
+declare @date datetime
+set @date='2002/06/12'
+--select @date
+
+select CONVERT(varchar(30),@date, 106)
+
+SELECT GETUTCDATE()
+SELECT GETDATE()
+
+-- Create the EmployeeDetail table
+CREATE TABLE EmployeeDetail (
+    EmployeeID INT PRIMARY KEY,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
+    Salary DECIMAL(15,2),
+    JoiningDate DATETIME,
+    Department VARCHAR(50),
+    Gender VARCHAR(10)
+);
+
+-- Insert data into EmployeeDetail table
+INSERT INTO EmployeeDetail (EmployeeID, FirstName, LastName, Salary, JoiningDate, Department, Gender) VALUES
+(1, 'Vikas', 'Ahlawat', 600000.00, '2013-02-15 11:16:28.290', 'IT', 'Male'),
+(2, 'nikita', 'Jain', 530000.00, '2014-01-09 17:31:07.793', 'HR', 'Female'),
+(3, 'Ashish', 'Kumar', 1000000.00, '2014-01-09 10:05:07.793', 'IT', 'Male'),
+(4, 'Nikhil', 'Sharma', 480000.00, '2014-01-09 09:00:07.793', 'HR', 'Male'),
+(5, 'anish', 'kadian', 500000.00, '2014-01-09 09:31:07.793', 'Payroll', 'Male');
+
+select *from EmployeeDetail
+
+
+select top 1 Salary from (select top 2 Salary from EmployeeDetail order by Salary desc) 
+EmployeeDetail  order by Salary asc
+
+select Department, sum(Salary) from EmployeeDetail group by Department order by SUM(Salary)
+
+select Department, AVG(Salary) from EmployeeDetail group by Department order by avg(Salary)
+
+select Department, max(Salary) from EmployeeDetail group by Department order by max(Salary)
+
+-- Create the ProjectDetail table
+CREATE TABLE ProjectDetail (
+    ProjectDetailID INT PRIMARY KEY,
+    EmployeeDetailID INT,
+    ProjectName VARCHAR(50)
+);
+
+-- Insert data into ProjectDetail table
+INSERT INTO ProjectDetail (ProjectDetailID, EmployeeDetailID, ProjectName) VALUES
+(1, 1, 'Task Track'),
+(2, 1, 'CLP'),
+(3, 1, 'Survey Managment'),
+(4, 2, 'HR Managment'),
+(5, 3, 'Task Track'),
+(6, 3, 'GRS'),
+(7, 3, 'DDS'),
+(8, 4, 'HR Managment'),
+(9, 6, 'GL Managment');
+
+select *from ProjectDetail
+
+select ProjectName, count(*) from ProjectDetail Group by ProjectName having Count(*)>1
+
+select e.FirstName, p.ProjectName from EmployeeDetail e
+join ProjectDetail p on(e.EmployeeID=p.EmployeeDetailID) order by e.FirstName
+
+select e.FirstName, p.ProjectName from EmployeeDetail e
+left join ProjectDetail p on(e.EmployeeID=p.EmployeeDetailID) order by e.FirstName
+
+select e.FirstName, isnull(p.ProjectName,'No Project assiend') as ProjectName from EmployeeDetail e
+left join ProjectDetail p on(e.EmployeeID=p.EmployeeDetailID) order by e.FirstName 
+
+select e.FirstName, p.ProjectName as ProjectName from EmployeeDetail e
+right join ProjectDetail p on(e.EmployeeID=p.EmployeeDetailID) order by e.FirstName
+
+select e.FirstName, p.ProjectName as ProjectName from EmployeeDetail e
+full join ProjectDetail p on(e.EmployeeID=p.EmployeeDetailID) order by e.FirstName
+
+select e.FirstName, ISNULL(p.ProjectName,'No Project assiend') from EmployeeDetail e
+left join ProjectDetail p on e.EmployeeID=p.EmployeeDetailID where p.ProjectName is null
+
+select e.FirstName, p.ProjectName from EmployeeDetail e
+right join ProjectDetail p on e.EmployeeID=p.EmployeeDetailID where e.FirstName is null
+
+select e.EmployeeID ,e.FirstName, p.ProjectName from EmployeeDetail e
+join ProjectDetail p on e.EmployeeID=p.EmployeeDetailID 
+where e.EmployeeID in(select EmployeeDetailID from ProjectDetail 
+group by EmployeeDetailID having count(*)>1)
+
+select p.ProjectName, e.FirstName from EmployeeDetail e
+inner join ProjectDetail p on e.EmployeeID=p.EmployeeDetailID
+where p.ProjectName in (select ProjectName from ProjectDetail
+group by ProjectName having count(1)>1)
+
+select $
+select count(7)
+
+select 'Saurabh'+1
+select (select 'Saurabh')
+
+select Count(*)+Count(*)
+SELECT SUM(1+2*3)
+SELECT max(1+2*3)
+SELECT MAX('VIKAS')
+SELECT 1 + '10'
+SELECT NULL + 5
+SELECT 1 WHERE NULL = NULL
+SELECT SUM('10')
+SELECT SUM(NULL)
+SELECT 6/0
+
+DECLARE @numerator INT = 6, @denominator INT = 0;
+SELECT 
+    CASE 
+        WHEN @denominator = 0 THEN NULL
+        ELSE @numerator / @denominator 
+    END AS Result;
+
+SELECT 0/9
+
+select FirstName from EmployeeDetail
+select Upper(SUBSTRING(FirstName,1,1))+Substring(FirstName,2,LEN(FirstName)-1) from EmployeeDetail
+
+select STUFF(
+  (select ', '+ FirstName from EmployeeDetail for xml path('')
+ )
+ ,1,2,'') as NameInRow
+
+ declare @name varchar(Max)=''
+ select @name=@name+ FirstName +',' from [dbo].[EmployeeDetail]
+ select SUBSTRING(@name,1,LEN(@name)-1) as [All Emp Names]
+
+ select * from EmployeeDetail 
+ select * from [dbo].[ProjectDetail]
+
+select ProjectName, STUFF((select ', ' + FirstName from EmployeeDetail E1 
+inner join ProjectDetail P1 on E1.EmployeeID=P1.EmployeeDetailID 
+where P1.ProjectName=P2.ProjectName for xml path('')),1,2,'') from EmployeeDetail E2 
+inner join ProjectDetail P2 on E2.EmployeeID=P2.EmployeeDetailID Group by ProjectName
+
+-- Create the FuelDetail Table
+CREATE TABLE FuelDetail (
+    ID INT PRIMARY KEY,
+    Fuel INT,
+    Date DATETIME
+)
+
+-- Insert data into FuelDetail table
+INSERT INTO FuelDetail (ID, Fuel, Date) VALUES
+(1, 10, '2014-04-25 10:00:00'),
+(2, 8, '2014-04-25 11:00:00'),
+(3, 7, '2014-04-25 12:00:00'),
+(4, 6, '2014-04-25 13:00:00'),
+(5, 5, '2014-04-25 14:00:00'),
+(6, 6, '2014-04-25 15:00:00'),
+(7, 7, '2014-04-25 16:00:00'),
+(8, 8, '2014-04-25 17:00:00'),
+(9, 9, '2014-04-25 18:00:00'),
+(10, 10, '2014-04-25 19:00:00'),
+(11, 11, '2014-04-25 20:00:00'),
+(12, 9, '2014-04-25 21:00:00'),
+(13, 10, '2014-04-25 22:00:00'),
+(14, 15, '2014-04-25 23:00:00');
+
+select *from FuelDetail
+
+
+--select c.Fuel from FuelDetail c join FuelDetail c1 on c.Date=(select)
+
+SELECT c1.fuel AS [Fuel quantity Now],c1.[Date],c.fuel AS [Fuel quantity Before],c.[Date]
+FROM FuelDetail c
+JOIN
+FuelDetail c1 ON c1.[Date] =(SELECT MIN([Date]) FROM FuelDetail WHERE [Date]>c.[Date] )
+
+WHERE c1.fuel<c.fuel
+
+select A.A from (select 1 A, 2 B) as A
+join (Select 1 A, 1 B) as B on A.A=B.B
+
+SELECT B.A FROM (SELECT 1 A) A
+JOIN (SELECT 1 A, 2 B)B ON A.A = B.A
+
+SELECT 1 A,2 B UNION ALL SELECT 1 A, 1 B
+SELECT 1 A UNION ALL SELECT 2 B
+
+SELECT * FROM (SELECT 1 A UNION ALL SELECT 2 B) A
+inner JOIN (SELECT 1 A, 2 B UNION ALL SELECT 1 A, 1 B)B ON A.A != B.B and B.A=1
+
+DECLARE @Name NVARCHAR(Max)
+SET @Name = N'विकास अहलावत'
+SELECT @Name as [Name of Employee]
+
+CREATE TABLE ExampleTable1 (PriKey int PRIMARY KEY, VerCol timestamp);
+
+insert into ExampleTable1(PriKey) values(1),(2)
+
+select *from ExampleTable1
+
+declare @name1 varchar(max)='Rahul', @num1 int=1
+declare @ss table (Name varchar(Max))
+while @num1<=LEN(@name1)
+begin
+ insert into @ss values( Substring(@name1, @num1,1))
+ set @num1= @num1+1
+end
+select *from @ss
+
+use MyDatabase
+
+declare @Number varchar(50)='1,2,3,4,5'
+
+declare @firstValue int=1
+Declare @T1 table(Id int)
+
+while @firstValue<=len(Replace(@Number,',',''))
+begin
+ insert into @T1 values(@firstValue)
+ set @firstValue=@firstValue+1
+end
+select *from @T1
+
+-------------------------------------------------
+create table #T2(id int)
+
+insert into #T2 values(1),(2),(3),(4),(5)
+select *from #T2
+
+select stuff((select ', '+ cast(id as varchar(Max)) from #T2 for XML Path('')),
+1,2,'') as Number 
+
+
+
+
+select compatibility_level from sys.databases where name = 'master'
+select @@version
+
+create table sales1
+(
+ id int,
+ [Name] varchar(20),
+ [Date] date,
+ sale decimal(10,2)
+)
+
+INSERT INTO sales1 (id, Name, Date, sale) VALUES
+(1, 'Alice', '2023-01-15', 500.00),
+(2, 'Bob', '2023-01-15', 1200.50),
+(3, 'Charlie', '2023-02-10', 750.00),
+(4, 'David', '2023-02-10', 300.00),
+(5, 'Eve', '2023-03-05', 450.75),
+(6, 'Frank', '2023-03-05', 220.00),
+(7, 'Grace', '2023-03-18', 900.25),
+(8, 'Hank', '2023-04-01', 500.00),
+(9, 'Ivy', '2023-04-01', 1000.00),
+(10, 'Jack', '2023-04-15', 800.50),
+(11, 'Ken', '2023-05-05', 1150.75),
+(12, 'Lily', '2023-05-20', 600.00),
+(13, 'Mia', '2023-06-10', 750.00),
+(14, 'Nina', '2023-06-10', 350.00),
+(15, 'Oscar', '2023-07-07', 940.25),
+(16, 'Paul', '2023-07-22', 620.00),
+(17, 'Quinn', '2023-08-03', 810.50),
+(18, 'Rose', '2023-08-03', 950.75),
+(19, 'Sam', '2023-09-14', 1100.00),
+(20, 'Tina', '2023-09-14', 1250.25);
+
+select *from sales1
+
+--Interview Questions
+WITH cte_salecount AS (
+    SELECT sale,
+           DENSE_RANK() OVER (ORDER BY sale DESC) AS row_num
+    FROM sales1
+    WHERE Date = '2023-09-14'
+)
+SELECT top 1 sale
+FROM cte_salecount
+WHERE row_num = 3;
+
+--(n)th highest Salary
+select *from [dbo].[EmployeeDetail]
+
+--Methode 1
+select top 1 Salary from
+(select distinct top 2  Salary 
+from EmployeeDetail
+order by Salary desc) as result
+order by Salary asc
+
+--Methode 2
+
+with Result
+as
+(
+Select Salary, DENSE_RANK() over(order by Salary) Dansrank from EmployeeDetail
+)
+select top 1 Salary
+from Result
+where Result.Dansrank=2
+
+--query get Orgnization hierirchy
+create table Employees1
+(
+ EmployeeId int primary key identity,
+ EmployeeName varchar(50),
+ ManagerId int foreign key references Employees1(EmployeeId)
+)
+
+INSERT INTO Employees1 (EmployeeName, ManagerID) VALUES
+('John', 5),
+('Mark', 8),
+('Steve', 8),
+('Tom', 3),
+('Lara', 8),
+('Simon', 2),
+('David', 4),
+('Ben', NULL),
+('Stacy', 2),
+('Sam', 5)
+
+select *from Employees1
+
+declare @id int=7;
+with Employees1_cte
+as
+(
+ select EmployeeId, EmployeeName, ManagerId 
+ from Employees1 
+ where EmployeeId=@id
+
+ union all
+
+ select Employees1.EmployeeId, Employees1.EmployeeName, Employees1.ManagerId from Employees1
+ join Employees1_cte
+ on Employees1.EmployeeId=Employees1_cte.ManagerId
+)
+select E1.EmployeeName, isnull(E2.EmployeeName,'No Boss') as ManagerName
+from Employees1_cte E1
+left join Employees1_cte E2
+on E1.ManagerId=E2.EmployeeId
+
+--most repeted Name
+CREATE TABLE Students
+(
+Name NVARCHAR(50)
+)
+GO
+INSERT INTO Students VALUES ('Sara')
+INSERT INTO Students VALUES ('Tom')
+INSERT INTO Students VALUES ('Mike')
+INSERT INTO Students VALUES ('Tom')
+INSERT INTO Students VALUES ('Vishal')
+INSERT INTO Students VALUES ('Vishal')
+INSERT INTO Students VALUES ('Vishal')
+
+select *from Students
+
+--select top 1 Name, count(Name) as repitation from Students
+--group by Name order by repitation desc
+
+select top 1 Name from Students
+group by Name order by COUNT(Name) desc
